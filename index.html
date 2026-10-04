@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patungin - Aplikasi Split Bill Pintar dengan Scan Struk</title>
+  <meta name="description" content="Patungin mempermudah hitung patungan dan split bill makan bareng. Scan struk otomatis dengan OCR cerdas, hitung talangan multi-payer, gratis dan 100% offline.">
+  <link rel="icon" type="image/png" href="assets/patungin_icon_512.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0D9488;
+      --primary-dark: #0F766E;
+      --primary-light: #14B8A6;
+      --primary-soft: #F0FDFA;
+      --dark-ink: #042F2E;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --surface: #FFFFFF;
+      --surface-alt: #F8FAFC;
+      --border: #E2E8F0;
+      --accent-amber: #F59E0B;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 25px -5px rgba(13, 148, 136, 0.12), 0 8px 10px -6px rgba(13, 148, 136, 0.08);
+      --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #FAFAFA;
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background gradient glow */
+    .ambient-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100vw;
+      height: 600px;
+      background: radial-gradient(circle at 50% 10%, rgba(20, 184, 166, 0.15) 0%, rgba(240, 253, 250, 0.6) 45%, transparent 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25);
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--dark-ink);
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(13, 148, 136, 0.2);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-github:hover {
+      background: var(--surface-alt);
+      border-color: #CBD5E1;
+    }
+
+    .btn-download-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border: none;
+      border-radius: 10px;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-download-nav:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);
+    }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 64px 24px 48px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--primary-soft);
+      border: 1px solid rgba(13, 148, 136, 0.3);
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.6); }
+      70% { box-shadow: 0 0 0 8px rgba(13, 148, 136, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+    }
+
+    .hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      color: var(--text-main);
+      max-width: 840px;
+      margin: 0 auto 20px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 19px;
+      color: var(--text-muted);
+      max-width: 660px;
+      margin: 0 auto 36px;
+      font-weight: 500;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .btn-primary-large {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #FFFFFF;
+      font-size: 17px;
+      font-weight: 700;
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-primary-large:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 32px -6px rgba(13, 148, 136, 0.35);
+    }
+
+    .btn-secondary-large {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 28px;
+      background: #FFFFFF;
+      color: var(--text-main);
+      font-size: 16px;
+      font-weight: 700;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary-large:hover {
+      background: var(--surface-alt);
+      border-color: #CBD5E1;
+    }
+
+    /* Direct Download & QR Card */
+    .download-box {
+      max-width: 720px;
+      margin: 0 auto 64px;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 36px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      text-align: left;
+    }
+
+    .download-info {
+      flex: 1;
+    }
+
+    .download-info h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .download-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    .download-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--surface-alt);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .qr-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px;
+      background: var(--surface-alt);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .qr-container img {
+      width: 110px;
+      height: 110px;
+      border-radius: 6px;
+    }
+
+    .qr-container span {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Interactive Live Demo Calculator */
+    .demo-section {
+      max-width: 900px;
+      margin: 0 auto 72px;
+      padding: 0 24px;
+    }
+
+    .card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .section-tag {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .calc-input-group {
+      margin-bottom: 18px;
+    }
+
+    .calc-input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .calc-input {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .calc-input:focus {
+      border-color: var(--primary);
+    }
+
+    .calc-result-box {
+      background: var(--primary-soft);
+      border: 1px solid rgba(13, 148, 136, 0.25);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .result-row strong {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .result-total {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1.5px dashed rgba(13, 148, 136, 0.3);
+    }
+
+    .result-total-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--primary-dark);
+    }
+
+    .result-total-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    /* Features Grid */
+    .features-section {
+      max-width: 1140px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-top: 36px;
+    }
+
+    .feature-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: #CBD5E1;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--primary-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 18px;
+      color: var(--primary);
+    }
+
+    .feature-card h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Installation Steps */
+    .install-section {
+      max-width: 860px;
+      margin: 0 auto 90px;
+      padding: 0 24px;
+    }
+
+    .install-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #FFFFFF;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-body h5 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .step-body p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    footer {
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 34px;
+      }
+      .calc-grid {
+        grid-template-columns: 1fr;
+      }
+      .download-box {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+      .download-meta {
+        justify-content: center;
+      }
+      .qr-container {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <img src="assets/patungin_icon_512.png" alt="Logo Patungin">
+        <div>
+          <span class="brand-title">Patungin</span>
+        </div>
+        <span class="brand-tag">v1.0.0</span>
+      </a>
+      <div class="nav-actions">
+        <a href="https://github.com/luckytrusted8-svg/Patungin" target="_blank" rel="noopener" class="btn-github">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          GitHub
+        </a>
+        <a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" class="btn-download-nav">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Download APK
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Rilis Resmi v1.0.0 • Siap Diinstal di Android
+    </div>
+    <h1>Split Bill Jadi <span>Cepat, Akurat</span> & Transparan.</h1>
+    <p>Aplikasi hitung patungan modern dengan OCR kamera otomatis. Hitung porsi, diskon, dan talangan multi-orang tanpa ribet kalkulator manual.</p>
+
+    <div class="hero-cta">
+      <a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" class="btn-primary-large">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        Download APK Android Langsung
+      </a>
+      <a href="https://github.com/luckytrusted8-svg/Patungin/releases/tag/v1.0.0" target="_blank" rel="noopener" class="btn-secondary-large">
+        Catatan Rilis di GitHub →
+      </a>
+    </div>
+
+    <!-- Download Card Box with QR -->
+    <div class="download-box">
+      <div class="download-info">
+        <h3>Paket Instalasi Mandiri (APK)</h3>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">
+          Langsung pasang di smartphone Android Anda. Tanpa perlu mendaftar akun atau login.
+        </p>
+        <div class="download-meta">
+          <span>📦 Versi: <strong>1.0.0</strong></span>
+          <span>🤖 Android: <strong>7.0+</strong></span>
+          <span>⚡ Ukuran: <strong>87 MB</strong></span>
+          <span>🛡️ 100% Bebas Iklan</span>
+        </div>
+      </div>
+      <div class="qr-container">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=0&data=https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" alt="QR Code Download APK">
+        <span>Scan via Kamera HP</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Live Simulator Demo -->
+  <section class="demo-section">
+    <div class="card">
+      <div class="section-header">
+        <div class="section-tag">SIMULATOR INTERAKTIF</div>
+        <h2 class="section-title">Coba Hitung Cepat di Browser</h2>
+      </div>
+
+      <div class="calc-grid">
+        <div>
+          <div class="calc-input-group">
+            <label for="subtotal">Subtotal Makanan (Rp)</label>
+            <input type="number" id="subtotal" class="calc-input" value="120000" step="5000">
+          </div>
+          <div class="calc-input-group">
+            <label for="taxRate">Pajak Resto PB1 (%)</label>
+            <input type="number" id="taxRate" class="calc-input" value="10" step="1">
+          </div>
+          <div class="calc-input-group">
+            <label for="serviceRate">Service Charge (%)</label>
+            <input type="number" id="serviceRate" class="calc-input" value="5" step="1">
+          </div>
+          <div class="calc-input-group">
+            <label for="people">Jumlah Teman Patungan</label>
+            <input type="number" id="people" class="calc-input" value="3" min="1" max="50">
+          </div>
+        </div>
+
+        <div class="calc-result-box">
+          <div>
+            <div class="result-row">
+              <span>Subtotal Menu:</span>
+              <strong id="resSubtotal">Rp 120.000</strong>
+            </div>
+            <div class="result-row">
+              <span>Pajak (10%):</span>
+              <strong id="resTax">Rp 12.000</strong>
+            </div>
+            <div class="result-row">
+              <span>Service (5%):</span>
+              <strong id="resService">Rp 6.000</strong>
+            </div>
+            <div class="result-row">
+              <span>Total Tagihan Resto:</span>
+              <strong id="resTotal" style="color: var(--primary);">Rp 138.000</strong>
+            </div>
+          </div>
+
+          <div class="result-total">
+            <div class="result-total-label">Bayar Per Orang:</div>
+            <div class="result-total-value" id="resPerPerson">Rp 46.000</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+              *Di aplikasi Patungin, pembagian dihitung adil per item & porsi masing-masing!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="features-section">
+    <div class="section-header">
+      <div class="section-tag">KEUNGGULAN UTAMA</div>
+      <h2 class="section-title">Dibuat Khusus untuk Budaya Nongkrong</h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📸</div>
+        <h4>Scan Struk Otomatis</h4>
+        <p>Arahkan kamera ke struk kafe atau resto. Mesin OCR mengenali nama menu, harga, pajak, dan diskon secara instan.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🪙</div>
+        <h4>Talangan Multi-Payer</h4>
+        <p>Bisa catat lebih dari satu orang yang menalangi uang. Algoritma otomatis mencari transfer paling ringkas agar tidak saling transfer bolak-balik.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">⚖️</div>
+        <h4>Porsi & Diskon Adil</h4>
+        <p>Makan bareng 1 pizza dibagi 4 orang? Atau diskon promo 20%? Semua dibagikan secara proporsional sesuai nominal pesanan masing-masing.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h4>100% Offline & Privat</h4>
+        <p>Tidak ada database server yang mengumpulkan data Anda. Semua riwayat tagihan tersimpan aman hanya di memori smartphone lokal.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Steps -->
+  <section class="install-section">
+    <div class="section-header">
+      <div class="section-tag">PANDUAN PEMASANGAN</div>
+      <h2 class="section-title">Cara Pasang APK di Smartphone Android</h2>
+    </div>
+
+    <div class="install-steps">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h5>Download File APK</h5>
+          <p>Tap tombol <strong>"Download APK Android Langsung"</strong> di halaman ini atau scan QR code dari HP Anda.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h5>Buka Notifikasi Unduhan</h5>
+          <p>Setelah unduhan selesai, tap notifikasi file <code>app-release.apk</code> untuk memulai pemasangan.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h5>Izinkan Sumber Tidak Dikenal</h5>
+          <p>Jika browser (Chrome/Edge) meminta izin keamanan instalasi aplikasi, pilih <em>"Izinkan dari sumber ini"</em> (pengaturan resmi Android untuk file APK mandiri).</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h5>Selesai & Siap Pakai!</h5>
+          <p>Tekan <strong>Install</strong> dan buka aplikasi Patungin. Anda bisa langsung scan struk pertama Anda!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div style="max-width: 1140px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <img src="assets/patungin_icon_512.png" width="24" height="24" style="border-radius: 6px;">
+        <strong style="color: var(--text-main); font-family: 'Outfit', sans-serif;">Patungin v1.0.0</strong>
+      </div>
+      <p>Aplikasi Split Bill Pintar & Terbuka untuk Semua. Dibuat dengan cinta & Flutter.</p>
+      <div>
+        <a href="https://github.com/luckytrusted8-svg/Patungin" target="_blank" rel="noopener">Repositori GitHub</a> •
+        <a href="https://github.com/luckytrusted8-svg/Patungin/releases/tag/v1.0.0" target="_blank" rel="noopener">Rilis Resmi</a> •
+        <a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk">Download APK (Direct)</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Live Split Bill Simulator
+    function formatRupiah(number) {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+      }).format(number);
+    }
+
+    function calculate() {
+      const subtotal = Math.max(0, parseFloat(document.getElementById('subtotal').value) || 0);
+      const taxRate = Math.max(0, parseFloat(document.getElementById('taxRate').value) || 0);
+      const serviceRate = Math.max(0, parseFloat(document.getElementById('serviceRate').value) || 0);
+      const people = Math.max(1, parseInt(document.getElementById('people').value) || 1);
+
+      const tax = Math.round(subtotal * (taxRate / 100));
+      const service = Math.round(subtotal * (serviceRate / 100));
+      const total = subtotal + tax + service;
+      const perPerson = Math.round(total / people);
+
+      document.getElementById('resSubtotal').textContent = formatRupiah(subtotal);
+      document.getElementById('resTax').textContent = formatRupiah(tax);
+      document.getElementById('resService').textContent = formatRupiah(service);
+      document.getElementById('resTotal').textContent = formatRupiah(total);
+      document.getElementById('resPerPerson').textContent = formatRupiah(perPerson);
+    }
+
+    document.querySelectorAll('.calc-input').forEach(input => {
+      input.addEventListener('input', calculate);
+    });
+
+    calculate();
+  </script>
+</body>
+</html>
