@@ -1,34 +1,43 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <!--
+  /* Hallmark · macrostructure: Split Studio · theme: modern-minimal (Emerald)
+   * nav: N5 Floating pill · footer: Ft4 Dense colophon
+   * pre-emit critique: P5 H5 E5 S5 R5 V5
+   * tells eliminated: gradient-text · emoji-icons · ambient-glow · pulsing-dot · 3-col-cards · centered-everything
+   */
+  -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patungin - Aplikasi Split Bill Pintar dengan Scan Struk</title>
-  <meta name="description" content="Patungin mempermudah hitung patungan dan split bill makan bareng. Scan struk otomatis dengan OCR cerdas, hitung talangan multi-payer, gratis dan 100% offline.">
+  <title>Patungin — Split Bill Offline dengan Scan Struk</title>
+  <meta name="description" content="Aplikasi hitung patungan dan split bill berbasis Android. Scan kamera membaca struk kafe/resto offline, alokasi porsi presisi, dan kalkulator multi-talangan.">
   <link rel="icon" type="image/png" href="assets/patungin_icon_512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #0D9488;
-      --primary-dark: #0F766E;
-      --primary-light: #14B8A6;
-      --primary-soft: #F0FDFA;
-      --dark-ink: #042F2E;
-      --text-main: #0F172A;
-      --text-muted: #64748B;
-      --surface: #FFFFFF;
-      --surface-alt: #F8FAFC;
-      --border: #E2E8F0;
-      --accent-amber: #F59E0B;
-      --radius-sm: 8px;
-      --radius-md: 16px;
-      --radius-lg: 24px;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 20px 25px -5px rgba(13, 148, 136, 0.12), 0 8px 10px -6px rgba(13, 148, 136, 0.08);
-      --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.06);
+      --color-paper: #F8FAFC;
+      --color-surface: #FFFFFF;
+      --color-ink: #0F172A;
+      --color-muted: #64748B;
+      --color-faint: #94A3B8;
+      --color-accent: #0D9488;
+      --color-accent-dark: #0F766E;
+      --color-accent-wash: #F0FDFA;
+      --color-accent-border: #CCFBF1;
+      --color-border: #E2E8F0;
+      --color-border-subtle: #F1F5F9;
+      --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --dur-fast: 120ms;
+      --dur-normal: 200ms;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
@@ -37,820 +46,1008 @@
       padding: 0;
     }
 
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #FAFAFA;
-      color: var(--text-main);
+    html, body {
+      background-color: var(--color-paper);
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      font-size: 15px;
       line-height: 1.6;
-      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: clip;
     }
 
-    /* Ambient background gradient glow */
-    .ambient-glow {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100vw;
-      height: 600px;
-      background: radial-gradient(circle at 50% 10%, rgba(20, 184, 166, 0.15) 0%, rgba(240, 253, 250, 0.6) 45%, transparent 70%);
-      z-index: -1;
+    /* Accessibility focus rings */
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    /* Floating Pill Navigation (N5) */
+    .nav-wrap {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      padding: 0 16px;
       pointer-events: none;
     }
 
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-container {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 14px 24px;
+    .nav-pill {
+      pointer-events: auto;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 12px 8px 14px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--color-border);
+      border-radius: 9999px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+      max-width: 960px;
+      width: 100%;
     }
 
-    .brand {
+    .brand-link {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
       color: inherit;
     }
 
-    .brand img {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25);
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: block;
     }
 
-    .brand-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--dark-ink);
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--color-ink);
     }
 
     .brand-tag {
+      font-family: var(--font-mono);
       font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      background: var(--primary-soft);
-      color: var(--primary);
-      padding: 2px 8px;
-      border-radius: 12px;
-      border: 1px solid rgba(13, 148, 136, 0.2);
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .btn-github {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-main);
-      background: #FFFFFF;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-
-    .btn-github:hover {
-      background: var(--surface-alt);
-      border-color: #CBD5E1;
-    }
-
-    .btn-download-nav {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 18px;
-      font-size: 14px;
-      font-weight: 700;
-      color: #FFFFFF;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      border: none;
-      border-radius: 10px;
-      text-decoration: none;
-      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
-      transition: all 0.2s ease;
-    }
-
-    .btn-download-nav:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);
-    }
-
-    /* Hero Section */
-    .hero {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 64px 24px 48px;
-      text-align: center;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      background: var(--primary-soft);
-      border: 1px solid rgba(13, 148, 136, 0.3);
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--primary-dark);
-      margin-bottom: 24px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .hero-badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--primary);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.6); }
-      70% { box-shadow: 0 0 0 8px rgba(13, 148, 136, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
-    }
-
-    .hero h1 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 48px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      line-height: 1.15;
-      color: var(--text-main);
-      max-width: 840px;
-      margin: 0 auto 20px;
-    }
-
-    .hero h1 span {
-      background: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero p {
-      font-size: 19px;
-      color: var(--text-muted);
-      max-width: 660px;
-      margin: 0 auto 36px;
       font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: var(--color-accent-wash);
+      color: var(--color-accent-dark);
+      border: 1px solid var(--color-accent-border);
     }
 
-    .hero-cta {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 48px;
-    }
-
-    .btn-primary-large {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 32px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: #FFFFFF;
-      font-size: 17px;
-      font-weight: 700;
-      border-radius: 14px;
-      text-decoration: none;
-      box-shadow: var(--shadow-lg);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .btn-primary-large:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 24px 32px -6px rgba(13, 148, 136, 0.35);
-    }
-
-    .btn-secondary-large {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 28px;
-      background: #FFFFFF;
-      color: var(--text-main);
-      font-size: 16px;
-      font-weight: 700;
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      text-decoration: none;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
-    }
-
-    .btn-secondary-large:hover {
-      background: var(--surface-alt);
-      border-color: #CBD5E1;
-    }
-
-    /* Direct Download & QR Card */
-    .download-box {
-      max-width: 720px;
-      margin: 0 auto 64px;
-      background: #FFFFFF;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 28px 36px;
-      box-shadow: var(--shadow-card);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 32px;
-      text-align: left;
-    }
-
-    .download-info {
+    .nav-spacer {
       flex: 1;
     }
 
-    .download-info h3 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: var(--text-main);
-    }
-
-    .download-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+    .nav-link {
       font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 12px;
-    }
-
-    .download-meta span {
+      font-weight: 600;
+      color: var(--color-muted);
+      text-decoration: none;
+      transition: color var(--dur-fast) var(--ease-out);
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      background: var(--surface-alt);
-      padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
+      gap: 6px;
     }
 
-    .qr-container {
-      display: flex;
-      flex-direction: column;
+    .nav-link:hover {
+      color: var(--color-ink);
+    }
+
+    .btn-nav-download {
+      display: inline-flex;
       align-items: center;
-      text-align: center;
-      padding: 10px;
-      background: var(--surface-alt);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-    }
-
-    .qr-container img {
-      width: 110px;
-      height: 110px;
-      border-radius: 6px;
-    }
-
-    .qr-container span {
-      font-size: 11px;
+      gap: 7px;
+      padding: 7px 14px;
+      font-size: 13px;
       font-weight: 600;
-      color: var(--text-muted);
-      margin-top: 6px;
+      color: #FFFFFF;
+      background: var(--color-accent);
+      border: 1px solid var(--color-accent-dark);
+      border-radius: 9999px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background var(--dur-fast) var(--ease-out);
     }
 
-    /* Interactive Live Demo Calculator */
-    .demo-section {
-      max-width: 900px;
-      margin: 0 auto 72px;
+    .btn-nav-download:hover {
+      background: var(--color-accent-dark);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
       padding: 0 24px;
     }
 
-    .card {
-      background: #FFFFFF;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 36px;
-      box-shadow: var(--shadow-card);
+    /* Split Studio Hero */
+    .hero-split {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: center;
+      padding: 64px 0 72px;
     }
 
-    .section-header {
-      text-align: center;
+    .hero-lead-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-accent-dark);
+      background: var(--color-accent-wash);
+      border: 1px solid var(--color-accent-border);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+    }
+
+    .hero-lead-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-accent);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+      color: var(--color-ink);
+      margin-bottom: 18px;
+    }
+
+    .hero-desc {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--color-muted);
+      margin-bottom: 32px;
+      max-width: 520px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
       margin-bottom: 32px;
     }
 
-    .section-tag {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--primary);
-      margin-bottom: 6px;
-    }
-
-    .section-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 30px;
-      font-weight: 800;
-      color: var(--text-main);
-    }
-
-    .calc-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 28px;
-    }
-
-    .calc-input-group {
-      margin-bottom: 18px;
-    }
-
-    .calc-input-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
-    }
-
-    .calc-input {
-      width: 100%;
-      padding: 12px 14px;
-      font-size: 15px;
-      font-family: inherit;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .calc-input:focus {
-      border-color: var(--primary);
-    }
-
-    .calc-result-box {
-      background: var(--primary-soft);
-      border: 1px solid rgba(13, 148, 136, 0.25);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .result-row {
-      display: flex;
-      justify-content: space-between;
+    .btn-primary {
+      display: inline-flex;
       align-items: center;
-      margin-bottom: 10px;
+      gap: 9px;
+      padding: 13px 22px;
       font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    .result-row strong {
-      color: var(--text-main);
       font-weight: 600;
-    }
-
-    .result-total {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1.5px dashed rgba(13, 148, 136, 0.3);
-    }
-
-    .result-total-label {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--primary-dark);
-    }
-
-    .result-total-value {
-      font-family: 'Outfit', sans-serif;
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--primary-dark);
-    }
-
-    /* Features Grid */
-    .features-section {
-      max-width: 1140px;
-      margin: 0 auto 80px;
-      padding: 0 24px;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 24px;
-      margin-top: 36px;
-    }
-
-    .feature-card {
-      background: #FFFFFF;
-      border: 1px solid var(--border);
+      color: #FFFFFF;
+      background: var(--color-accent);
+      border: 1px solid var(--color-accent-dark);
       border-radius: var(--radius-md);
-      padding: 28px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background-color var(--dur-fast) var(--ease-out), transform 100ms var(--ease-out);
     }
 
-    .feature-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
+    .btn-primary:hover {
+      background: var(--color-accent-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-ink);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-border-subtle);
       border-color: #CBD5E1;
     }
 
-    .feature-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: var(--primary-soft);
+    .spec-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-top: 20px;
+      border-top: 1px solid var(--color-border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-muted);
+    }
+
+    .spec-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .spec-item svg {
+      color: var(--color-faint);
+    }
+
+    /* Live Receipt & Calculation Workbench (Right side of Diptych) */
+    .workbench-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.07);
+      overflow: hidden;
+    }
+
+    .workbench-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: var(--color-border-subtle);
+      border-bottom: 1px solid var(--color-border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-muted);
+    }
+
+    .workbench-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-accent-dark);
+      font-weight: 600;
+    }
+
+    .workbench-body {
+      padding: 22px;
+    }
+
+    .receipt-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-ink);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .receipt-title span {
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 12px;
+      color: var(--color-faint);
+    }
+
+    .parsed-items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .parsed-items-table td {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .parsed-items-table td:last-child {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .item-qty {
+      font-family: var(--font-mono);
+      color: var(--color-muted);
+      font-size: 12px;
+      margin-right: 8px;
+    }
+
+    .calc-interactive-bar {
+      background: var(--color-paper);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-top: 14px;
+    }
+
+    .calc-row-split {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--color-muted);
+    }
+
+    .calc-row-split:last-child {
+      margin-bottom: 0;
+    }
+
+    .people-stepper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-ink);
+      font-weight: 700;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .step-btn:hover {
+      background: var(--color-border-subtle);
+    }
+
+    .step-val {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--color-ink);
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .split-result-box {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .split-result-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-muted);
+    }
+
+    .split-result-amount {
+      font-family: var(--font-mono);
       font-size: 24px;
-      margin-bottom: 18px;
-      color: var(--primary);
-    }
-
-    .feature-card h4 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 18px;
       font-weight: 700;
-      margin-bottom: 8px;
-      color: var(--text-main);
+      color: var(--color-accent-dark);
+      font-variant-numeric: tabular-nums;
     }
 
-    .feature-card p {
+    /* Section Rhythm: Tabular Spec & Capabilities */
+    .section-spec {
+      padding: 72px 0 84px;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .section-intro {
+      max-width: 620px;
+      margin-bottom: 40px;
+    }
+
+    .section-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-accent);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--color-ink);
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      font-size: 15px;
+      color: var(--color-muted);
+    }
+
+    /* Capability Spec Matrix (Tabular spec sheet) */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .spec-table tr {
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .spec-table tr:last-child {
+      border-bottom: none;
+    }
+
+    .spec-table td {
+      padding: 24px 28px;
+      vertical-align: top;
+    }
+
+    .spec-table td.col-icon {
+      width: 48px;
+      padding-right: 0;
+    }
+
+    .spec-table td.col-meta {
+      width: 240px;
+    }
+
+    .spec-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--color-accent-wash);
+      border: 1px solid var(--color-accent-border);
+      color: var(--color-accent-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spec-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-ink);
+      margin-bottom: 4px;
+    }
+
+    .spec-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-muted);
+      background: var(--color-paper);
+      border: 1px solid var(--color-border);
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .spec-desc {
       font-size: 14px;
-      color: var(--text-muted);
+      color: var(--color-muted);
       line-height: 1.6;
     }
 
-    /* Installation Steps */
-    .install-section {
-      max-width: 860px;
-      margin: 0 auto 90px;
-      padding: 0 24px;
+    /* Installation & Distribution Section */
+    .section-install {
+      padding: 72px 0 88px;
+      border-top: 1px solid var(--color-border);
     }
 
-    .install-steps {
+    .download-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 36px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    }
+
+    .install-timeline {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      margin-top: 28px;
-    }
-
-    .step-item {
-      display: flex;
       gap: 20px;
-      align-items: flex-start;
-      background: #FFFFFF;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 20px 24px;
     }
 
-    .step-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: var(--primary);
-      color: #FFFFFF;
-      font-weight: 800;
+    .timeline-step {
+      display: flex;
+      gap: 16px;
+    }
+
+    .timeline-glyph {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--color-accent-wash);
+      border: 1px solid var(--color-accent-border);
+      color: var(--color-accent-dark);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
 
-    .step-body h5 {
-      font-size: 16px;
+    .timeline-content h4 {
+      font-size: 14px;
       font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 4px;
+      color: var(--color-ink);
+      margin-bottom: 2px;
     }
 
-    .step-body p {
-      font-size: 14px;
-      color: var(--text-muted);
+    .timeline-content p {
+      font-size: 13px;
+      color: var(--color-muted);
     }
 
-    /* Footer */
-    footer {
-      background: #FFFFFF;
-      border-top: 1px solid var(--border);
-      padding: 40px 24px;
+    .qr-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: var(--color-paper);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
       text-align: center;
-      font-size: 14px;
-      color: var(--text-muted);
     }
 
-    footer a {
-      color: var(--primary);
+    .qr-frame {
+      background: #FFFFFF;
+      padding: 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+    }
+
+    .qr-frame img {
+      width: 124px;
+      height: 124px;
+      display: block;
+    }
+
+    .qr-caption {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-muted);
+    }
+
+    /* Dense Colophon Footer (Ft4) */
+    footer {
+      border-top: 1px solid var(--color-border);
+      padding: 40px 0;
+      background: var(--color-surface);
+      font-size: 13px;
+      color: var(--color-muted);
+    }
+
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--color-muted);
       text-decoration: none;
-      font-weight: 600;
+      transition: color var(--dur-fast) var(--ease-out);
     }
 
-    @media (max-width: 768px) {
-      .hero h1 {
+    .footer-links a:hover {
+      color: var(--color-ink);
+    }
+
+    /* Responsive Breakdown */
+    @media (max-width: 860px) {
+      .hero-split {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 40px 0 56px;
+      }
+      .hero-title {
         font-size: 34px;
       }
-      .calc-grid {
+      .download-grid {
         grid-template-columns: 1fr;
+        padding: 24px;
       }
-      .download-box {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
+      .spec-table td.col-meta {
+        width: 180px;
       }
-      .download-meta {
-        justify-content: center;
+    }
+
+    @media (max-width: 640px) {
+      .spec-table, .spec-table tbody, .spec-table tr, .spec-table td {
+        display: block;
+        width: 100% !important;
       }
-      .qr-container {
+      .spec-table td {
+        padding: 12px 20px;
+      }
+      .spec-table td.col-icon {
+        padding-top: 20px;
+      }
+      .spec-table td:last-child {
+        padding-bottom: 24px;
+      }
+      .nav-pill {
+        padding: 6px 10px;
+      }
+      .nav-links-wrap {
         display: none;
       }
     }
   </style>
 </head>
 <body>
-  <div class="ambient-glow"></div>
 
-  <!-- Header -->
-  <header>
-    <div class="nav-container">
-      <a href="#" class="brand">
-        <img src="assets/patungin_icon_512.png" alt="Logo Patungin">
-        <div>
-          <span class="brand-title">Patungin</span>
-        </div>
-        <span class="brand-tag">v1.0.0</span>
+  <!-- Floating Pill Navigation (N5) -->
+  <div class="nav-wrap">
+    <nav class="nav-pill">
+      <a href="#" class="brand-link">
+        <img src="assets/patungin_icon_512.png" alt="Patungin" class="brand-logo">
+        <span class="brand-name">Patungin</span>
       </a>
-      <div class="nav-actions">
-        <a href="https://github.com/luckytrusted8-svg/Patungin" target="_blank" rel="noopener" class="btn-github">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <span class="brand-tag">v1.0.0</span>
+
+      <div class="nav-spacer"></div>
+
+      <div class="nav-links-wrap">
+        <a href="https://github.com/luckytrusted8-svg/Patungin" target="_blank" rel="noopener" class="nav-link">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
           </svg>
-          GitHub
-        </a>
-        <a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" class="btn-download-nav">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
-          Download APK
+          Source
         </a>
       </div>
-    </div>
-  </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-badge">
-      <span class="hero-badge-dot"></span>
-      Rilis Resmi v1.0.0 • Siap Diinstal di Android
-    </div>
-    <h1>Split Bill Jadi <span>Cepat, Akurat</span> & Transparan.</h1>
-    <p>Aplikasi hitung patungan modern dengan OCR kamera otomatis. Hitung porsi, diskon, dan talangan multi-orang tanpa ribet kalkulator manual.</p>
-
-    <div class="hero-cta">
-      <a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" class="btn-primary-large">
-        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+      <a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" class="btn-nav-download">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
         </svg>
-        Download APK Android Langsung
+        Download APK
       </a>
-      <a href="https://github.com/luckytrusted8-svg/Patungin/releases/tag/v1.0.0" target="_blank" rel="noopener" class="btn-secondary-large">
-        Catatan Rilis di GitHub →
-      </a>
-    </div>
+    </nav>
+  </div>
 
-    <!-- Download Card Box with QR -->
-    <div class="download-box">
-      <div class="download-info">
-        <h3>Paket Instalasi Mandiri (APK)</h3>
-        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">
-          Langsung pasang di smartphone Android Anda. Tanpa perlu mendaftar akun atau login.
-        </p>
-        <div class="download-meta">
-          <span>📦 Versi: <strong>1.0.0</strong></span>
-          <span>🤖 Android: <strong>7.0+</strong></span>
-          <span>⚡ Ukuran: <strong>87 MB</strong></span>
-          <span>🛡️ 100% Bebas Iklan</span>
-        </div>
-      </div>
-      <div class="qr-container">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=0&data=https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" alt="QR Code Download APK">
-        <span>Scan via Kamera HP</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Interactive Live Simulator Demo -->
-  <section class="demo-section">
-    <div class="card">
-      <div class="section-header">
-        <div class="section-tag">SIMULATOR INTERAKTIF</div>
-        <h2 class="section-title">Coba Hitung Cepat di Browser</h2>
-      </div>
-
-      <div class="calc-grid">
-        <div>
-          <div class="calc-input-group">
-            <label for="subtotal">Subtotal Makanan (Rp)</label>
-            <input type="number" id="subtotal" class="calc-input" value="120000" step="5000">
-          </div>
-          <div class="calc-input-group">
-            <label for="taxRate">Pajak Resto PB1 (%)</label>
-            <input type="number" id="taxRate" class="calc-input" value="10" step="1">
-          </div>
-          <div class="calc-input-group">
-            <label for="serviceRate">Service Charge (%)</label>
-            <input type="number" id="serviceRate" class="calc-input" value="5" step="1">
-          </div>
-          <div class="calc-input-group">
-            <label for="people">Jumlah Teman Patungan</label>
-            <input type="number" id="people" class="calc-input" value="3" min="1" max="50">
-          </div>
-        </div>
-
-        <div class="calc-result-box">
-          <div>
-            <div class="result-row">
-              <span>Subtotal Menu:</span>
-              <strong id="resSubtotal">Rp 120.000</strong>
-            </div>
-            <div class="result-row">
-              <span>Pajak (10%):</span>
-              <strong id="resTax">Rp 12.000</strong>
-            </div>
-            <div class="result-row">
-              <span>Service (5%):</span>
-              <strong id="resService">Rp 6.000</strong>
-            </div>
-            <div class="result-row">
-              <span>Total Tagihan Resto:</span>
-              <strong id="resTotal" style="color: var(--primary);">Rp 138.000</strong>
-            </div>
-          </div>
-
-          <div class="result-total">
-            <div class="result-total-label">Bayar Per Orang:</div>
-            <div class="result-total-value" id="resPerPerson">Rp 46.000</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-              *Di aplikasi Patungin, pembagian dihitung adil per item & porsi masing-masing!
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Grid -->
-  <section class="features-section">
-    <div class="section-header">
-      <div class="section-tag">KEUNGGULAN UTAMA</div>
-      <h2 class="section-title">Dibuat Khusus untuk Budaya Nongkrong</h2>
-    </div>
-
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">📸</div>
-        <h4>Scan Struk Otomatis</h4>
-        <p>Arahkan kamera ke struk kafe atau resto. Mesin OCR mengenali nama menu, harga, pajak, dan diskon secara instan.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">🪙</div>
-        <h4>Talangan Multi-Payer</h4>
-        <p>Bisa catat lebih dari satu orang yang menalangi uang. Algoritma otomatis mencari transfer paling ringkas agar tidak saling transfer bolak-balik.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">⚖️</div>
-        <h4>Porsi & Diskon Adil</h4>
-        <p>Makan bareng 1 pizza dibagi 4 orang? Atau diskon promo 20%? Semua dibagikan secara proporsional sesuai nominal pesanan masing-masing.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">🔒</div>
-        <h4>100% Offline & Privat</h4>
-        <p>Tidak ada database server yang mengumpulkan data Anda. Semua riwayat tagihan tersimpan aman hanya di memori smartphone lokal.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Installation Steps -->
-  <section class="install-section">
-    <div class="section-header">
-      <div class="section-tag">PANDUAN PEMASANGAN</div>
-      <h2 class="section-title">Cara Pasang APK di Smartphone Android</h2>
-    </div>
-
-    <div class="install-steps">
-      <div class="step-item">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h5>Download File APK</h5>
-          <p>Tap tombol <strong>"Download APK Android Langsung"</strong> di halaman ini atau scan QR code dari HP Anda.</p>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h5>Buka Notifikasi Unduhan</h5>
-          <p>Setelah unduhan selesai, tap notifikasi file <code>app-release.apk</code> untuk memulai pemasangan.</p>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h5>Izinkan Sumber Tidak Dikenal</h5>
-          <p>Jika browser (Chrome/Edge) meminta izin keamanan instalasi aplikasi, pilih <em>"Izinkan dari sumber ini"</em> (pengaturan resmi Android untuk file APK mandiri).</p>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <h5>Selesai & Siap Pakai!</h5>
-          <p>Tekan <strong>Install</strong> dan buka aplikasi Patungin. Anda bisa langsung scan struk pertama Anda!</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <div style="max-width: 1140px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <img src="assets/patungin_icon_512.png" width="24" height="24" style="border-radius: 6px;">
-        <strong style="color: var(--text-main); font-family: 'Outfit', sans-serif;">Patungin v1.0.0</strong>
-      </div>
-      <p>Aplikasi Split Bill Pintar & Terbuka untuk Semua. Dibuat dengan cinta & Flutter.</p>
+  <main class="container">
+    <!-- Hero Section (Split Studio Diptych) -->
+    <section class="hero-split">
       <div>
-        <a href="https://github.com/luckytrusted8-svg/Patungin" target="_blank" rel="noopener">Repositori GitHub</a> •
-        <a href="https://github.com/luckytrusted8-svg/Patungin/releases/tag/v1.0.0" target="_blank" rel="noopener">Rilis Resmi</a> •
-        <a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk">Download APK (Direct)</a>
+        <div class="hero-lead-badge">
+          <span class="dot"></span>
+          <span>OFFLINE-FIRST ENGINE · ANDROID</span>
+        </div>
+        <h1 class="hero-title">Split bill tanpa tebak-tebakan. Hitung porsi & talangan langsung dari struk.</h1>
+        <p class="hero-desc">Scan kamera membaca struk kafe dan resto secara offline. Pembagian pajak, biaya service, dan diskon terhitung proporsional hingga rupiah terdekat.</p>
+
+        <div class="hero-actions">
+          <a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" class="btn-primary">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Download APK Android (v1.0.0)
+          </a>
+          <a href="https://github.com/luckytrusted8-svg/Patungin" target="_blank" rel="noopener" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
+
+        <div class="spec-strip">
+          <div class="spec-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
+            <span>87.7 MB</span>
+          </div>
+          <div class="spec-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>Android 7.0+</span>
+          </div>
+          <div class="spec-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+            <span>100% Offline</span>
+          </div>
+          <div class="spec-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+            <span>Bebas Iklan</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Right Column: Interactive Bill Engine Simulation -->
+      <div>
+        <div class="workbench-card">
+          <div class="workbench-head">
+            <span>SIMULASI KALKULATOR STRUK</span>
+            <div class="workbench-status">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              <span>OCR Validated</span>
+            </div>
+          </div>
+          <div class="workbench-body">
+            <div class="receipt-title">
+              <strong>Kedai Kopi & Dapur Senja</strong>
+              <span>#981248</span>
+            </div>
+
+            <table class="parsed-items-table">
+              <tbody>
+                <tr>
+                  <td><span class="item-qty">2x</span> Latte Caramel</td>
+                  <td>Rp 50.000</td>
+                </tr>
+                <tr>
+                  <td><span class="item-qty">1x</span> Nasi Goreng Spesial</td>
+                  <td>Rp 35.000</td>
+                </tr>
+                <tr>
+                  <td><span class="item-qty">1x</span> Toast Coklat Keju</td>
+                  <td>Rp 25.000</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="calc-interactive-bar">
+              <div class="calc-row-split">
+                <span>Subtotal Item:</span>
+                <strong style="font-family: var(--font-mono); color: var(--color-ink);">Rp 110.000</strong>
+              </div>
+              <div class="calc-row-split">
+                <span>Pajak Resto (10%):</span>
+                <strong style="font-family: var(--font-mono); color: var(--color-ink);">Rp 11.000</strong>
+              </div>
+              <div class="calc-row-split">
+                <span>Service Charge (5%):</span>
+                <strong style="font-family: var(--font-mono); color: var(--color-ink);">Rp 5.500</strong>
+              </div>
+              <div class="calc-row-split" style="padding-top: 6px; border-top: 1px solid var(--color-border);">
+                <span>Total Tagihan:</span>
+                <strong style="font-family: var(--font-mono); color: var(--color-ink);">Rp 126.500</strong>
+              </div>
+
+              <div class="calc-row-split" style="margin-top: 10px;">
+                <span>Peserta Patungan:</span>
+                <div class="people-stepper">
+                  <button type="button" class="step-btn" id="btnMinus" aria-label="Kurang peserta">−</button>
+                  <span class="step-val" id="peopleCount">3</span>
+                  <button type="button" class="step-btn" id="btnPlus" aria-label="Tambah peserta">+</button>
+                </div>
+              </div>
+
+              <div class="split-result-box">
+                <span class="split-result-label">Rata per Orang:</span>
+                <span class="split-result-amount" id="resultSplit">Rp 42.167</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capabilities Matrix Section (Tabular Spec) -->
+    <section class="section-spec">
+      <div class="section-intro">
+        <span class="section-num">01 / FITUR INTI</span>
+        <h2 class="section-heading">Spesifikasi Arsitektur Patungin</h2>
+        <p class="section-sub">Didesain khusus untuk menangani kerumitan pembagian tagihan nyata tanpa kompromi privasi data.</p>
+      </div>
+
+      <table class="spec-table">
+        <tbody>
+          <tr>
+            <td class="col-icon">
+              <div class="spec-icon-box">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                </svg>
+              </div>
+            </td>
+            <td class="col-meta">
+              <h3 class="spec-title">OCR Kamera On-Device</h3>
+              <span class="spec-badge">Google ML Kit Native</span>
+            </td>
+            <td>
+              <p class="spec-desc">Mendeteksi baris item, harga, diskon, dan subtotal langsung di HP. Mendukung format receipt kafe Indonesia (notasi 35k, ribuan titik, atau struk thermal miring) tanpa mengunggah foto Anda ke server cloud mana pun.</p>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="col-icon">
+              <div class="spec-icon-box">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z" />
+                </svg>
+              </div>
+            </td>
+            <td class="col-meta">
+              <h3 class="spec-title">Alokasi Porsi Proporsional</h3>
+              <span class="spec-badge">Largest Remainder Method</span>
+            </td>
+            <td>
+              <p class="spec-desc">Mendukung porsi pecahan (0.5x, 1x, 2x). Pajak restoran dan biaya layanan dibebankan secara proporsional sesuai nominal pesanan masing-masing orang, bukan dibagi rata buta yang merugikan pemesan hemat.</p>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="col-icon">
+              <div class="spec-icon-box">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
+                </svg>
+              </div>
+            </td>
+            <td class="col-meta">
+              <h3 class="spec-title">Penyelesaian Multi-Talangan</h3>
+              <span class="spec-badge">Greedy Debt Simplification</span>
+            </td>
+            <td>
+              <p class="spec-desc">Bisa mencatat banyak orang yang menalangi uang secara bersamaan (misal Andi bayar makanan, Budi bayar parkir dan minum). Algoritma menghitung rantai transfer paling sedikit agar tidak perlu saling transfer bolak-balik.</p>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="col-icon">
+              <div class="spec-icon-box">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+                </svg>
+              </div>
+            </td>
+            <td class="col-meta">
+              <h3 class="spec-title">Penyimpanan SQLite Lokal</h3>
+              <span class="spec-badge">Drift + SQLite FFI</span>
+            </td>
+            <td>
+              <p class="spec-desc">Database relasional tertanam di smartphone Anda. Berfungsi 100% tanpa internet, aman dari kebocoran data, dan tagihan riwayat tetap tersimpan rapi tanpa perlu membuat akun atau login.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Installation & Download Section -->
+    <section class="section-install">
+      <div class="section-intro">
+        <span class="section-num">02 / PEMASANGAN</span>
+        <h2 class="section-heading">Distribusi APK Mandiri</h2>
+        <p class="section-sub">Pasang file rilis resmi langsung di perangkat Android Anda dalam 3 langkah singkat.</p>
+      </div>
+
+      <div class="download-grid">
+        <div class="install-timeline">
+          <div class="timeline-step">
+            <div class="timeline-glyph">1</div>
+            <div class="timeline-content">
+              <h4>Unduh Paket APK</h4>
+              <p>Klik tombol unduh di bawah atau pindai kode QR menggunakan kamera ponsel Anda.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-glyph">2</div>
+            <div class="timeline-content">
+              <h4>Buka Berkas Unduhan</h4>
+              <p>Buka notifikasi unduhan berkas <code>app-release.apk</code> pada pengelola berkas Android.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-glyph">3</div>
+            <div class="timeline-content">
+              <h4>Konfirmasi Izin Sumber</h4>
+              <p>Pilih "Izinkan dari sumber ini" jika diminta oleh sistem keamanan Android, lalu tekan Pasang.</p>
+            </div>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" class="btn-primary">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              Unduh app-release.apk (87.7 MB)
+            </a>
+          </div>
+        </div>
+
+        <div class="qr-side">
+          <div class="qr-frame">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=0&data=https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk" alt="QR Code Unduhan APK">
+          </div>
+          <span class="qr-caption">Pindai langsung via kamera HP</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dense Colophon Footer (Ft4) -->
+  <footer>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="assets/patungin_icon_512.png" width="20" height="20" style="border-radius: 5px;">
+        <strong style="color: var(--color-ink); font-weight: 700;">Patungin</strong>
+        <span>· v1.0.0 (Release)</span>
+      </div>
+
+      <ul class="footer-links">
+        <li><a href="https://github.com/luckytrusted8-svg/Patungin" target="_blank" rel="noopener">GitHub Repositori</a></li>
+        <li><a href="https://github.com/luckytrusted8-svg/Patungin/releases/tag/v1.0.0" target="_blank" rel="noopener">Catatan Rilis</a></li>
+        <li><a href="https://github.com/luckytrusted8-svg/Patungin/releases/download/v1.0.0/app-release.apk">Unduh Langsung</a></li>
+      </ul>
     </div>
   </footer>
 
   <script>
-    // Live Split Bill Simulator
-    function formatRupiah(number) {
+    // Live Workbench Interactive Stepper
+    let people = 3;
+    const totalAmount = 126500;
+
+    function formatRupiah(num) {
       return new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         maximumFractionDigits: 0
-      }).format(number);
+      }).format(num);
     }
 
-    function calculate() {
-      const subtotal = Math.max(0, parseFloat(document.getElementById('subtotal').value) || 0);
-      const taxRate = Math.max(0, parseFloat(document.getElementById('taxRate').value) || 0);
-      const serviceRate = Math.max(0, parseFloat(document.getElementById('serviceRate').value) || 0);
-      const people = Math.max(1, parseInt(document.getElementById('people').value) || 1);
-
-      const tax = Math.round(subtotal * (taxRate / 100));
-      const service = Math.round(subtotal * (serviceRate / 100));
-      const total = subtotal + tax + service;
-      const perPerson = Math.round(total / people);
-
-      document.getElementById('resSubtotal').textContent = formatRupiah(subtotal);
-      document.getElementById('resTax').textContent = formatRupiah(tax);
-      document.getElementById('resService').textContent = formatRupiah(service);
-      document.getElementById('resTotal').textContent = formatRupiah(total);
-      document.getElementById('resPerPerson').textContent = formatRupiah(perPerson);
+    function updateSplit() {
+      document.getElementById('peopleCount').textContent = people;
+      const split = Math.round(totalAmount / people);
+      document.getElementById('resultSplit').textContent = formatRupiah(split);
     }
 
-    document.querySelectorAll('.calc-input').forEach(input => {
-      input.addEventListener('input', calculate);
+    document.getElementById('btnMinus').addEventListener('click', () => {
+      if (people > 1) {
+        people--;
+        updateSplit();
+      }
     });
 
-    calculate();
+    document.getElementById('btnPlus').addEventListener('click', () => {
+      if (people < 30) {
+        people++;
+        updateSplit();
+      }
+    });
+
+    updateSplit();
   </script>
 </body>
 </html>
