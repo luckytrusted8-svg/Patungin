@@ -430,7 +430,9 @@ class _ReviewOcrScreenState extends ConsumerState<ReviewOcrScreen> {
                           ],
                         ),
                         subtitle: Text(
-                          '${item.quantity} × ${MoneyFormatter.format(item.unitPrice)}',
+                          item.unit != null && item.unit!.isNotEmpty
+                              ? '${item.quantity} ${item.unit} × ${MoneyFormatter.format(item.unitPrice)}'
+                              : '${item.quantity} × ${MoneyFormatter.format(item.unitPrice)}',
                           style: const TextStyle(color: AppColors.textSecondaryLight),
                         ),
                         trailing: Row(

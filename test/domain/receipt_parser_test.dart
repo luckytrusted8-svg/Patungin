@@ -155,6 +155,79 @@ void main() {
       expect(receipt.rawLines.length, equals(4));
     });
 
+    test('Contoh 7: Format struk sembako/grosir 2-baris dengan satuan dan detail perkalian', () {
+      final lines = [
+        const OcrLine(text: 'TOKO ABANG'),
+        const OcrLine(text: 'GROSIR SEMBAKO DAN BERAS'),
+        const OcrLine(text: 'Jl. Rorojonggrang Raya B1 No.13 Kel. Melong - Cimahi'),
+        const OcrLine(text: 'No. Struk : 211  10.01.2023-10:11:07'),
+        const OcrLine(text: 'Beras'),
+        const OcrLine(text: '4.000 Kg X 12.500 Rp. 50.000.000'),
+        const OcrLine(text: 'Minyak Goreng'),
+        const OcrLine(text: '1600 Kg X 27.500 Rp. 44.000.000'),
+        const OcrLine(text: 'Gula Pasir'),
+        const OcrLine(text: '1600 Kg X 15.000 Rp. 24.000.000'),
+        const OcrLine(text: 'The Celup Isi 25'),
+        const OcrLine(text: '800 Box X 7.500 Rp. 6.000.000'),
+        const OcrLine(text: 'Mie Instan'),
+        const OcrLine(text: '8.000 Pcs X 3.000 Rp. 24.000.000'),
+        const OcrLine(text: 'Susu Kaleng'),
+        const OcrLine(text: '1600 Klg X 14.000 Rp. 22.400.000'),
+        const OcrLine(text: 'Sarden'),
+        const OcrLine(text: '1600 Klg X 14.000 Rp. 22.400.000'),
+        const OcrLine(text: 'Kardus Packing'),
+        const OcrLine(text: '800 Pcs X 9.000 Rp. 7.800.000'), // Typo OCR diuji di sini
+        const OcrLine(text: 'Subtotal Rp. 200.000.000'),
+        const OcrLine(text: 'Bayar Rp. 200.000.000'),
+        const OcrLine(text: 'Kembali Rp. 0'),
+        const OcrLine(text: 'TERIMA KASIH'),
+      ];
+
+      final receipt = ReceiptParser.parse(lines);
+
+      expect(receipt.items.length, equals(8));
+      expect(receipt.items[0].name, equals('Beras'));
+      expect(receipt.items[0].quantity, equals(4000));
+      expect(receipt.items[0].unit, equals('Kg'));
+      expect(receipt.items[0].unitPrice, equals(12500));
+      expect(receipt.items[0].totalPrice, equals(50000000));
+
+      expect(receipt.items[1].name, equals('Minyak Goreng'));
+      expect(receipt.items[1].quantity, equals(1600));
+      expect(receipt.items[1].totalPrice, equals(44000000));
+
+      expect(receipt.items[2].name, equals('Gula Pasir'));
+      expect(receipt.items[2].quantity, equals(1600));
+      expect(receipt.items[2].totalPrice, equals(24000000));
+
+      expect(receipt.items[3].name, equals('The Celup Isi 25'));
+      expect(receipt.items[3].quantity, equals(800));
+      expect(receipt.items[3].unit, equals('Box'));
+      expect(receipt.items[3].unitPrice, equals(7500));
+      expect(receipt.items[3].totalPrice, equals(6000000));
+
+      expect(receipt.items[4].name, equals('Mie Instan'));
+      expect(receipt.items[4].quantity, equals(8000));
+      expect(receipt.items[4].totalPrice, equals(24000000));
+
+      expect(receipt.items[5].name, equals('Susu Kaleng'));
+      expect(receipt.items[5].quantity, equals(1600));
+      expect(receipt.items[5].totalPrice, equals(22400000));
+
+      expect(receipt.items[6].name, equals('Sarden'));
+      expect(receipt.items[6].quantity, equals(1600));
+      expect(receipt.items[6].totalPrice, equals(22400000));
+
+      expect(receipt.items[7].name, equals('Kardus Packing'));
+      expect(receipt.items[7].quantity, equals(800));
+      expect(receipt.items[7].unitPrice, equals(9000));
+      expect(receipt.items[7].totalPrice, equals(7200000));
+
+      expect(receipt.subtotal, equals(200000000));
+      expect(receipt.isSubtotalConsistent, isTrue);
+      expect(receipt.subtotalDifference, equals(0));
+    });
+
     test('Input kosong tidak melempar error', () {
       final emptyReceipt = ReceiptParser.parse([]);
       expect(emptyReceipt.isEmpty, isTrue);

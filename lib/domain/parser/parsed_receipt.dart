@@ -24,6 +24,7 @@ class OcrLine {
 class ParsedItem {
   final String name;
   final int quantity;
+  final String? unit;
   final int unitPrice;
   final int totalPrice;
   final double confidence; // 0.0 to 1.0
@@ -32,6 +33,7 @@ class ParsedItem {
   const ParsedItem({
     required this.name,
     required this.quantity,
+    this.unit,
     required this.unitPrice,
     required this.totalPrice,
     this.confidence = 1.0,
@@ -43,6 +45,7 @@ class ParsedItem {
   ParsedItem copyWith({
     String? name,
     int? quantity,
+    String? unit,
     int? unitPrice,
     int? totalPrice,
     double? confidence,
@@ -53,6 +56,7 @@ class ParsedItem {
     return ParsedItem(
       name: name ?? this.name,
       quantity: newQty,
+      unit: unit ?? this.unit,
       unitPrice: newUnitPrice,
       totalPrice: totalPrice ?? (newQty * newUnitPrice),
       confidence: confidence ?? this.confidence,
@@ -62,7 +66,7 @@ class ParsedItem {
 
   @override
   String toString() =>
-      'ParsedItem(name: "$name", qty: $quantity, unit: $unitPrice, total: $totalPrice, conf: $confidence)';
+      'ParsedItem(name: "$name", qty: $quantity, unit: $unit, unitPrice: $unitPrice, total: $totalPrice, conf: $confidence)';
 }
 
 class ParsedReceipt {
